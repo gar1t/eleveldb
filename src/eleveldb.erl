@@ -46,7 +46,7 @@
 -export_type([db_ref/0,
               itr_ref/0]).
 
--on_load(init/0).
+-export([init/1]).
 
 -ifdef(TEST).
 -compile(export_all).
@@ -65,20 +65,9 @@
                 Reply
         end).
 
--spec init() -> ok | {error, any()}.
-init() ->
-    SoName = case code:priv_dir(?MODULE) of
-                 {error, bad_name} ->
-                     case code:which(?MODULE) of
-                         Filename when is_list(Filename) ->
-                             filename:join([filename:dirname(Filename),"../priv", "eleveldb"]);
-                         _ ->
-                             filename:join("../priv", "eleveldb")
-                     end;
-                 Dir ->
-                     filename:join(Dir, "eleveldb")
-             end,
-    erlang:load_nif(SoName, application:get_all_env(eleveldb)).
+-spec init(string()) -> ok | {error, any()}.
+init(Path) ->
+    erlang:load_nif(Path, application:get_all_env(eleveldb)).
 
 -type open_options() :: [{create_if_missing, boolean()} |
                          {error_if_exists, boolean()} |
